@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Payslip - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span id="sidebarRoleBadge" class="brand-title-badge">PORTAL</span>
+        </div>
+      </div>
+
+      <nav id="sidebarNav" class="sidebar-nav">
+        <!-- Will be populated dynamically based on role -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; Salary Engine
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Monthly Payslip Voucher</h1>
+            <p>Certified compensation statement & absence deduction report</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">US</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">User</span>
+              <span id="topbarUserRole" class="role-badge">Member</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container" style="max-width: 950px;">
+
+        <!-- Selector Controls Card (Hidden during print) -->
+        <div class="card payslip-controls">
+          <div class="form-row">
+            <!-- Employee Dropdown (Visible only to Admin) -->
+            <div id="payslipEmployeeSelectorContainer" class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="payslipEmployeeSelect">Select Employee</label>
+              <select id="payslipEmployeeSelect" class="form-control">
+                <!-- Dynamically populated employees -->
+              </select>
+            </div>
+
+            <!-- Month/Year Input -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="payslipMonthInput">Pay Period (Month & Year)</label>
+              <input type="month" id="payslipMonthInput" class="form-control">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-light);">
+            <button id="printPayslipBtn" class="btn btn-primary" title="Print or Save as PDF">
+              <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Print / Save as PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="payslipEmptyState" class="empty-state" style="display: none;">
+          <div class="empty-state-icon">
+            <i data-lucide="file-question" style="width: 30px; height: 30px;"></i>
+          </div>
+          <h3>Select an Employee</h3>
+          <p>Please choose an employee and pay period from the selector above to preview the payslip.</p>
+        </div>
+
+        <!-- Rendered Payslip Card Container -->
+        <div id="payslipVoucherContainer" class="card" style="padding: 0; overflow: hidden;">
+          <!-- Dynamically generated payslip HTML -->
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/payslip.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = Storage.getSession();
+      const company = Storage.getCompany();
+
+      // Set company name in sidebar
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      // Populate sidebar depending on role
+      const sidebarNav = document.getElementById('sidebarNav');
+      const roleBadge = document.getElementById('sidebarRoleBadge');
+
+      if (session && session.role === 'admin') {
+        if (roleBadge) {
+          roleBadge.textContent = 'ADMIN';
+          roleBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+          roleBadge.style.color = '#a5b4fc';
+        }
+        sidebarNav.innerHTML = `
+          <div class="nav-section-title">Main Operations</div>
+          <a href="admin.html" class="nav-item">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="employees.html" class="nav-item">
+            <i data-lucide="users"></i>
+            <span>Employees</span>
+          </a>
+          <a href="leaves.html" class="nav-item">
+            <i data-lucide="calendar-off"></i>
+            <span>Leave Management</span>
+          </a>
+          <a href="payslip.html" class="nav-item active">
+            <i data-lucide="receipt"></i>
+            <span>Monthly Payslips</span>
+          </a>
+          <div class="nav-section-title">Administration</div>
+          <a href="settings.html" class="nav-item">
+            <i data-lucide="settings"></i>
+            <span>Company Settings</span>
+          </a>
+        `;
+      } else {
+        if (roleBadge) {
+          roleBadge.textContent = 'PORTAL';
+          roleBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+          roleBadge.style.color = '#6ee7b7';
+        }
+        sidebarNav.innerHTML = `
+          <div class="nav-section-title">My Workspace</div>
+          <a href="employee.html" class="nav-item">
+            <i data-lucide="layout-dashboard"></i>
+            <span>My Dashboard</span>
+          </a>
+          <a href="payslip.html" class="nav-item active">
+            <i data-lucide="receipt"></i>
+            <span>My Payslip</span>
+          </a>
+        `;
+      }
+      UI.initIcons();
+
+      // Initialize Payslip logic
+      Payslip.init();
+      SmartHelper.init();
+    });
+  </script>
+</body>
+</html>

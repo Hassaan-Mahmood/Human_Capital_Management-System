@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Settings - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span class="brand-title-badge">ADMIN</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Main Operations</div>
+        <a href="admin.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <i data-lucide="users"></i>
+          <span>Employees</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <i data-lucide="calendar-off"></i>
+          <span>Leave Management</span>
+        </a>
+        <a href="payslip.html" class="nav-item">
+          <i data-lucide="receipt"></i>
+          <span>Monthly Payslips</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item active">
+          <i data-lucide="settings"></i>
+          <span>Company Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; v1.0 Hackathon
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Company Settings</h1>
+            <p>Configure operational policies, office hours, leave quotas & data backups</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">AD</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">Administrator</span>
+              <span id="topbarUserRole" class="role-badge">Administrator</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container" style="max-width: 900px;">
+
+        <form id="companySettingsForm">
+          <!-- 1. Organization & Admin Profile -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i data-lucide="briefcase" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                Organization & Brand Identity
+              </h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="settingCompanyName">Company Legal Name <span class="required">*</span></label>
+              <input type="text" id="settingCompanyName" class="form-control" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="settingAdminName">Root Administrator Name <span class="required">*</span></label>
+                <input type="text" id="settingAdminName" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingAdminEmail">Administrator Email <span class="required">*</span></label>
+                <input type="email" id="settingAdminEmail" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="settingLogoUrl">Company Logo URL (Optional)</label>
+              <input type="url" id="settingLogoUrl" class="form-control" placeholder="https://example.com/logo.png">
+              <span class="form-hint">Used on payslips and navigation headers if provided.</span>
+            </div>
+          </div>
+
+          <!-- 2. Attendance & Punctuality Policies -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                Attendance & Punctuality Engine
+              </h3>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label" for="settingStartTime">Official Start Time <span class="required">*</span></label>
+                <input type="time" id="settingStartTime" class="form-control" required>
+                <span class="form-hint">Expected arrival</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingGracePeriod">Grace Period (Minutes) <span class="required">*</span></label>
+                <input type="number" id="settingGracePeriod" class="form-control" min="0" max="120" required>
+                <span class="form-hint">Lateness leeway</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingLeaveQuota">Annual Paid Leave Quota <span class="required">*</span></label>
+                <input type="number" id="settingLeaveQuota" class="form-control" min="1" max="100" required>
+                <span class="form-hint">Days/year per employee</span>
+              </div>
+            </div>
+
+            <!-- Working Days of the Week Selection -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Scheduled Working Days</label>
+              <div class="days-picker-group">
+                <div>
+                  <input type="checkbox" id="workDay_1" value="1" class="day-pill-checkbox">
+                  <label for="workDay_1" class="day-pill-label">Mon</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_2" value="2" class="day-pill-checkbox">
+                  <label for="workDay_2" class="day-pill-label">Tue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_3" value="3" class="day-pill-checkbox">
+                  <label for="workDay_3" class="day-pill-label">Wed</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_4" value="4" class="day-pill-checkbox">
+                  <label for="workDay_4" class="day-pill-label">Thu</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_5" value="5" class="day-pill-checkbox">
+                  <label for="workDay_5" class="day-pill-label">Fri</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_6" value="6" class="day-pill-checkbox">
+                  <label for="workDay_6" class="day-pill-label">Sat</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="workDay_0" value="0" class="day-pill-checkbox">
+                  <label for="workDay_0" class="day-pill-label">Sun</label>
+                </div>
+              </div>
+              <span class="form-hint">Working days directly dictate monthly salary working day calculations and leave deduction exclusions.</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px;">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i data-lucide="check" style="width: 18px; height: 18px;"></i> Save System Settings
+            </button>
+          </div>
+        </form>
+
+        <!-- 3. Backup, Restore & Danger Zone -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i data-lucide="database" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+              Data Management & Backup
+            </h3>
+          </div>
+
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+            <button type="button" id="backupDataBtn" class="btn btn-secondary">
+              <i data-lucide="download" style="width: 16px; height: 16px;"></i> Export LocalStorage Backup (JSON)
+            </button>
+
+            <label class="btn btn-secondary" style="cursor: pointer;">
+              <i data-lucide="upload" style="width: 16px; height: 16px;"></i> Restore From Backup (JSON)
+              <input type="file" id="restoreDataInput" accept=".json" style="display: none;">
+            </label>
+          </div>
+
+          <div style="padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--danger-border); background-color: var(--danger-bg);">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--danger); margin-bottom: 4px;">
+              Danger Zone &bull; Factory Reset
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--danger-text); margin-bottom: 14px;">
+              Wipe all users, attendance logs, and leaves from this browser's localStorage and return to the First-Run Setup Wizard.
+            </p>
+            <button type="button" id="resetSystemBtn" class="btn btn-danger">
+              <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i> Reset All Application Data
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const company = Storage.getCompany();
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      Settings.init();
+      SmartHelper.init();
+    });
+  </script>
+</body>
+</html>

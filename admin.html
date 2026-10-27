@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons, Chart.js & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span class="brand-title-badge">ADMIN</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Main Operations</div>
+        <a href="admin.html" class="nav-item active">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <i data-lucide="users"></i>
+          <span>Employees</span>
+          <span id="sidebarEmpBadge" class="nav-badge" style="display:none;">0</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <i data-lucide="calendar-off"></i>
+          <span>Leave Management</span>
+          <span id="sidebarLeaveBadge" class="nav-badge" style="display:none;">0</span>
+        </a>
+        <a href="payslip.html" class="nav-item">
+          <i data-lucide="receipt"></i>
+          <span>Monthly Payslips</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Company Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; v1.0 Hackathon
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>HR Overview Dashboard</h1>
+            <p>Live company metrics, workforce punctuality & attendance tracking</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">AD</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">Administrator</span>
+              <span id="topbarUserRole" class="role-badge">Administrator</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Container -->
+      <div class="page-container">
+
+        <!-- Metrics KPI Grid -->
+        <div class="stats-grid">
+          <!-- 1. Total Active Employees -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Active Employees</span>
+              <span id="metricTotalActive" class="stat-value">0</span>
+              <span class="stat-desc">Enrolled in company</span>
+            </div>
+            <div class="stat-icon-box stat-icon-primary">
+              <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 2. Present Today -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Present Today</span>
+              <span id="metricPresentToday" class="stat-value" style="color: var(--success);">0</span>
+              <span class="stat-desc">Checked in on-time</span>
+            </div>
+            <div class="stat-icon-box stat-icon-success">
+              <i data-lucide="user-check" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 3. Approved Leave Today -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">On Leave Today</span>
+              <span id="metricOnLeaveToday" class="stat-value" style="color: var(--info);">0</span>
+              <span class="stat-desc">Approved time off</span>
+            </div>
+            <div class="stat-icon-box stat-icon-info">
+              <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 4. Late Arrivals Today -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Late Arrivals</span>
+              <span id="metricLateToday" class="stat-value" style="color: var(--warning);">0</span>
+              <span class="stat-desc">Past grace period</span>
+            </div>
+            <div class="stat-icon-box stat-icon-warning">
+              <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 5. Half-Days Today -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Half-Day Records</span>
+              <span id="metricHalfDayToday" class="stat-value" style="color: var(--warning);">0</span>
+              <span class="stat-desc">Under 5 completed hrs</span>
+            </div>
+            <div class="stat-icon-box stat-icon-warning">
+              <i data-lucide="hourglass" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 6. Absent Employees Today -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Absent Today</span>
+              <span id="metricAbsentToday" class="stat-value" style="color: var(--danger);">0</span>
+              <span class="stat-desc">Unlogged working day</span>
+            </div>
+            <div class="stat-icon-box stat-icon-danger">
+              <i data-lucide="user-x" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+
+          <!-- 7. Pending Leave Requests -->
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Pending Leaves</span>
+              <span id="metricPendingLeaves" class="stat-value">0</span>
+              <span class="stat-desc">Awaiting HR action</span>
+            </div>
+            <div class="stat-icon-box stat-icon-primary">
+              <i data-lucide="inbox" style="width: 24px; height: 24px;"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts & Activity Row -->
+        <div class="dashboard-grid-2">
+          <!-- Attendance Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i data-lucide="pie-chart" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                  Today's Attendance Breakdown
+                </h3>
+                <p class="card-subtitle">Real-time attendance ratio across all departments</p>
+              </div>
+            </div>
+            <div class="chart-container" style="display: flex; align-items: center; justify-content: center;">
+              <canvas id="attendanceDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Attendance Activity -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i data-lucide="activity" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                  Live Attendance Feed
+                </h3>
+                <p class="card-subtitle">Latest check-in & check-out logs today</p>
+              </div>
+            </div>
+            <div id="recentActivityList" class="activity-list" style="max-height: 280px; overflow-y: auto;">
+              <!-- Dynamic activity items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaves & Announcements Row -->
+        <div class="dashboard-grid-equal">
+          <!-- Leave Requests Quick Review Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i data-lucide="file-text" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                  Pending Leave Approvals
+                </h3>
+                <p class="card-subtitle">Requests requiring immediate administrative decision</p>
+              </div>
+              <a href="leaves.html" class="btn btn-sm btn-secondary">View All</a>
+            </div>
+            <div id="dashboardPendingLeavesContainer">
+              <!-- Render pending leaves or empty state -->
+            </div>
+          </div>
+
+          <!-- Company Announcements Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i data-lucide="megaphone" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                  Company Announcements
+                </h3>
+                <p class="card-subtitle">Broadcasts visible to all employees</p>
+              </div>
+              <button id="openAddAnnouncementBtn" class="btn btn-sm btn-primary">
+                <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Post Notice
+              </button>
+            </div>
+            <div id="announcementsContainer" class="announcement-list" style="max-height: 320px; overflow-y: auto;">
+              <!-- Dynamic announcements -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Announcement Modal -->
+  <div id="announcementModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="megaphone" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+          Publish Announcement
+        </h3>
+        <button class="modal-close-btn" onclick="UI.closeModal('announcementModal')">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <form id="announcementForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="announcementTitle">Title <span class="required">*</span></label>
+            <input type="text" id="announcementTitle" class="form-control" placeholder="e.g. Monthly Townhall Schedule" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="announcementPriority">Priority</label>
+              <select id="announcementPriority" class="form-control">
+                <option value="Normal">Normal</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="announcementCategory">Category</label>
+              <select id="announcementCategory" class="form-control">
+                <option value="General">General</option>
+                <option value="Policy">Policy Update</option>
+                <option value="Event">Office Event</option>
+                <option value="Holiday">Holiday</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="announcementMessage">Message <span class="required">*</span></label>
+            <textarea id="announcementMessage" class="form-control" rows="4" placeholder="Enter the announcement text..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('announcementModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="send" style="width: 16px; height: 16px;"></i> Publish Notice
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/leave.js"></script>
+  <script src="js/announcements.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    let attendanceChartInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set company name in sidebar
+      const company = Storage.getCompany();
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      // Initialize Smart Helper
+      SmartHelper.init();
+
+      // Initialize Announcements
+      Announcements.init();
+
+      // Render Admin Dashboard dynamic figures
+      renderAdminDashboard();
+    });
+
+    function renderAdminDashboard() {
+      const stats = Attendance.getTodayStats();
+      const leaves = Storage.getLeaves();
+      const pendingLeaves = leaves.filter(l => l.status === 'pending');
+
+      // Update KPI metrics
+      document.getElementById('metricTotalActive').textContent = stats.totalEmployees;
+      document.getElementById('metricPresentToday').textContent = stats.present;
+      document.getElementById('metricOnLeaveToday').textContent = stats.onLeave;
+      document.getElementById('metricLateToday').textContent = stats.late;
+      document.getElementById('metricHalfDayToday').textContent = stats.halfDay;
+      document.getElementById('metricAbsentToday').textContent = stats.absent;
+      document.getElementById('metricPendingLeaves').textContent = pendingLeaves.length;
+
+      // Update badge counts in sidebar
+      const empBadge = document.getElementById('sidebarEmpBadge');
+      if (empBadge) {
+        empBadge.textContent = stats.totalEmployees;
+        empBadge.style.display = stats.totalEmployees > 0 ? 'inline-block' : 'none';
+      }
+
+      const leaveBadge = document.getElementById('sidebarLeaveBadge');
+      if (leaveBadge) {
+        leaveBadge.textContent = pendingLeaves.length;
+        leaveBadge.style.display = pendingLeaves.length > 0 ? 'inline-block' : 'none';
+      }
+
+      // Render Chart
+      renderAttendanceChart(stats);
+
+      // Render Live Activity Feed
+      renderLiveActivity();
+
+      // Render Dashboard Pending Leaves Quick View
+      renderQuickPendingLeaves(pendingLeaves);
+    }
+
+    function renderAttendanceChart(stats) {
+      const ctx = document.getElementById('attendanceDoughnutChart');
+      if (!ctx) return;
+
+      if (attendanceChartInstance) {
+        attendanceChartInstance.destroy();
+      }
+
+      const total = stats.present + stats.late + stats.halfDay + stats.onLeave + stats.absent;
+
+      if (total === 0) {
+        ctx.style.display = 'none';
+        const parent = ctx.parentElement;
+        if (!document.getElementById('chartEmptyMessage')) {
+          const msg = document.createElement('div');
+          msg.id = 'chartEmptyMessage';
+          msg.className = 'empty-state';
+          msg.innerHTML = '<p style="color:var(--text-muted)">No attendance or employee records recorded yet today.</p>';
+          parent.appendChild(msg);
+        }
+        return;
+      }
+
+      const emptyMsg = document.getElementById('chartEmptyMessage');
+      if (emptyMsg) emptyMsg.remove();
+      ctx.style.display = 'block';
+
+      attendanceChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Present (On-Time)', 'Late Arrivals', 'Half-Days', 'Approved Leave', 'Absent'],
+          datasets: [{
+            data: [stats.present, stats.late, stats.halfDay, stats.onLeave, stats.absent],
+            backgroundColor: ['#10b981', '#f59e0b', '#fbbf24', '#3b82f6', '#ef4444'],
+            borderWidth: 2,
+            borderColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#111827' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                font: { family: 'Inter', size: 12 },
+                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#9ca3af' : '#475569'
+              }
+            }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    function renderLiveActivity() {
+      const container = document.getElementById('recentActivityList');
+      if (!container) return;
+
+      const today = Storage.getTodayString();
+      const records = Storage.getAttendance({ date: today }).sort((a, b) => (b.checkIn || '').localeCompare(a.checkIn || ''));
+
+      if (records.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 20px;">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0;">No check-ins logged yet today.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = records.map(r => {
+        const initials = (r.userName || 'Employee').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const isLate = r.status === 'late' || r.isLate;
+        const statusText = isLate 
+          ? `<span style="color:var(--warning); font-weight:600;">Check-in (Late +${r.lateMinutes}m)</span>` 
+          : `<span style="color:var(--success); font-weight:600;">Check-in</span>`;
+
+        return `
+          <div class="activity-item">
+            <div class="activity-avatar">${initials}</div>
+            <div class="activity-content">
+              <div class="activity-title">
+                <strong>${UI.escapeHTML(r.userName || 'Employee')}</strong> &bull; ${statusText} at ${r.checkIn}
+                ${r.checkOut ? ` &bull; Checked out: ${r.checkOut} (${r.workHours}h)` : ''}
+              </div>
+              <div class="activity-time">${r.method || 'Web Portal'} &bull; Today</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderQuickPendingLeaves(pendingLeaves) {
+      const container = document.getElementById('dashboardPendingLeavesContainer');
+      if (!container) return;
+
+      if (pendingLeaves.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px;">
+            <div class="empty-state-icon" style="width: 44px; height: 44px; margin-bottom: 8px;">
+              <i data-lucide="check-check" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h4 style="font-size: 0.95rem; font-weight: 600;">All Caught Up!</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0;">No pending leave requests awaiting approval.</p>
+          </div>
+        `;
+        UI.initIcons();
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="table-container" style="border: none;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Dates</th>
+                <th>Days</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pendingLeaves.slice(0, 4).map(l => `
+                <tr>
+                  <td><strong>${UI.escapeHTML(l.userName)}</strong></td>
+                  <td><span class="badge badge-info">${l.leaveType.toUpperCase()}</span></td>
+                  <td>${UI.formatDate(l.startDate)} - ${UI.formatDate(l.endDate)}</td>
+                  <td><strong>${l.workingDays}</strong>d</td>
+                  <td style="text-align: right;">
+                    <a href="leaves.html" class="btn btn-sm btn-primary">Review</a>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      UI.initIcons();
+    }
+  </script>
+</body>
+</html>

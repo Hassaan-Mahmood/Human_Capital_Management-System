@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave Management - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span class="brand-title-badge">ADMIN</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Main Operations</div>
+        <a href="admin.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="employees.html" class="nav-item">
+          <i data-lucide="users"></i>
+          <span>Employees</span>
+        </a>
+        <a href="leaves.html" class="nav-item active">
+          <i data-lucide="calendar-off"></i>
+          <span>Leave Management</span>
+        </a>
+        <a href="payslip.html" class="nav-item">
+          <i data-lucide="receipt"></i>
+          <span>Monthly Payslips</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Company Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; v1.0 Hackathon
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Leave Requests Review</h1>
+            <p>Review employee time-off requests, quota deductions & approvals</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">AD</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">Administrator</span>
+              <span id="topbarUserRole" class="role-badge">Administrator</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container">
+
+        <!-- Stat Highlights -->
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Total Submissions</span>
+              <span id="adminLeaveTotalCount" class="stat-value">0</span>
+              <span class="stat-desc">All time requests</span>
+            </div>
+            <div class="stat-icon-box stat-icon-primary"><i data-lucide="inbox"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Pending Action</span>
+              <span id="adminLeavePendingCount" class="stat-value" style="color: var(--warning);">0</span>
+              <span class="stat-desc">Awaiting decision</span>
+            </div>
+            <div class="stat-icon-box stat-icon-warning"><i data-lucide="clock"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Approved Leaves</span>
+              <span id="adminLeaveApprovedCount" class="stat-value" style="color: var(--success);">0</span>
+              <span class="stat-desc">Deducted from quota</span>
+            </div>
+            <div class="stat-icon-box stat-icon-success"><i data-lucide="check-circle-2"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Rejected Leaves</span>
+              <span id="adminLeaveRejectedCount" class="stat-value" style="color: var(--danger);">0</span>
+              <span class="stat-desc">Denied with comment</span>
+            </div>
+            <div class="stat-icon-box stat-icon-danger"><i data-lucide="x-circle"></i></div>
+          </div>
+        </div>
+
+        <!-- Leaves Card -->
+        <div class="card">
+          <div class="table-toolbar">
+            <div class="table-search-box">
+              <i data-lucide="search" class="table-search-icon" style="width: 18px; height: 18px;"></i>
+              <input type="text" id="adminLeaveSearchInput" class="form-control" placeholder="Search by employee name or reason...">
+            </div>
+
+            <div class="table-filters">
+              <select id="adminLeaveStatusFilter" class="form-control" style="width: auto; min-width: 150px;">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending Only</option>
+                <option value="approved">Approved Only</option>
+                <option value="rejected">Rejected Only</option>
+              </select>
+
+              <select id="adminLeaveTypeFilter" class="form-control" style="width: auto; min-width: 150px;">
+                <option value="all">All Leave Types</option>
+                <option value="casual">Casual Leave</option>
+                <option value="sick">Sick Leave</option>
+                <option value="annual">Annual Leave</option>
+                <option value="unpaid">Unpaid Leave</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="adminLeavesEmptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+              <i data-lucide="calendar" style="width: 30px; height: 30px;"></i>
+            </div>
+            <h3>No Leave Requests</h3>
+            <p>No applications match your selected filters.</p>
+          </div>
+
+          <!-- Table Container -->
+          <div id="adminLeavesTableContainer" class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Employee & Dept</th>
+                  <th>Type</th>
+                  <th>Dates Range</th>
+                  <th>Duration</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>HR Comment</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminLeavesTableBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+
+            <div class="table-footer">
+              <span id="adminLeavesCountDisplay">Showing 0 requests</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Real-time leave balance updates</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/leave.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const company = Storage.getCompany();
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      Leaves.initAdminLeaves();
+      SmartHelper.init();
+    });
+  </script>
+</body>
+</html>

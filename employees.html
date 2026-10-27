@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Management - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span class="brand-title-badge">ADMIN</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Main Operations</div>
+        <a href="admin.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="employees.html" class="nav-item active">
+          <i data-lucide="users"></i>
+          <span>Employees</span>
+        </a>
+        <a href="leaves.html" class="nav-item">
+          <i data-lucide="calendar-off"></i>
+          <span>Leave Management</span>
+        </a>
+        <a href="payslip.html" class="nav-item">
+          <i data-lucide="receipt"></i>
+          <span>Monthly Payslips</span>
+        </a>
+
+        <div class="nav-section-title">Administration</div>
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Company Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; 
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Employee Directory</h1>
+            <p>Manage staff profiles, departmental assignments, and authentication accounts</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">AD</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">Administrator</span>
+              <span id="topbarUserRole" class="role-badge">Administrator</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container">
+
+        <!-- Stat Highlights Bar -->
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Total Enrolled</span>
+              <span id="empStatTotal" class="stat-value">0</span>
+              <span class="stat-desc">Staff accounts</span>
+            </div>
+            <div class="stat-icon-box stat-icon-primary"><i data-lucide="users"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Active Status</span>
+              <span id="empStatActive" class="stat-value" style="color: var(--success);">0</span>
+              <span class="stat-desc">Can log in & punch</span>
+            </div>
+            <div class="stat-icon-box stat-icon-success"><i data-lucide="user-check"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Inactive / On Hold</span>
+              <span id="empStatInactive" class="stat-value" style="color: var(--text-muted);">0</span>
+              <span class="stat-desc">Access suspended</span>
+            </div>
+            <div class="stat-icon-box stat-icon-warning"><i data-lucide="user-x"></i></div>
+          </div>
+        </div>
+
+        <!-- Table Toolbar & Action Card -->
+        <div class="card">
+          <div class="table-toolbar">
+            <div class="table-search-box">
+              <i data-lucide="search" class="table-search-icon" style="width: 18px; height: 18px;"></i>
+              <input type="text" id="employeeSearchInput" class="form-control" placeholder="Search by name, email, ID, or title...">
+            </div>
+
+            <div class="table-filters">
+              <select id="employeeDeptFilter" class="form-control" style="width: auto; min-width: 160px;">
+                <option value="all">All Departments</option>
+              </select>
+
+              <select id="employeeStatusFilter" class="form-control" style="width: auto; min-width: 140px;">
+                <option value="all">All Statuses</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+              </select>
+
+              <button id="exportEmployeesBtn" class="btn btn-secondary" title="Export to CSV">
+                <i data-lucide="download" style="width: 16px; height: 16px;"></i> Export CSV
+              </button>
+
+              <button id="openAddEmployeeBtn" class="btn btn-primary">
+                <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i> Add Employee
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="employeeEmptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+              <i data-lucide="users" style="width: 30px; height: 30px;"></i>
+            </div>
+            <h3>No Employees Registered</h3>
+            <p>Your directory is empty. Click below to add your first employee to the company.</p>
+            <button class="btn btn-primary" onclick="Employees.openAddModal()">
+              <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Add Employee
+            </button>
+          </div>
+
+          <!-- Employee Data Table -->
+          <div id="employeeTableContainer" class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>ID</th>
+                  <th>Designation / Dept</th>
+                  <th>Contact</th>
+                  <th>Basic Salary</th>
+                  <th>Joining Date</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+
+            <div class="table-footer">
+              <span id="employeeCountDisplay">Showing 0 employees</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Synced with localStorage</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Add / Edit Employee Modal -->
+  <div id="employeeModal" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 id="modalEmployeeTitle" class="modal-title">Add New Employee</h3>
+        <button class="modal-close-btn" onclick="UI.closeModal('employeeModal')">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <form id="employeeForm" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="employeeId">
+
+          <!-- Row 1: Personal Details -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="employeeName">Full Name <span class="required">*</span></label>
+              <input type="text" id="employeeName" class="form-control" placeholder="e.g. Alex Morgan" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="employeeEmail">Email Address <span class="required">*</span></label>
+              <input type="email" id="employeeEmail" class="form-control" placeholder="alex@company.com" required>
+            </div>
+          </div>
+
+          <!-- Row 2: Credentials & Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="employeePassword">Login Password <span class="required">*</span></label>
+              <input type="text" id="employeePassword" class="form-control" placeholder="Initial password for login" required>
+              <span id="passwordHelpText" class="form-hint">Used by the employee to log in to their dashboard.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="employeePhone">Phone Number</label>
+              <input type="tel" id="employeePhone" class="form-control" placeholder="e.g. +92 300 1234567">
+            </div>
+          </div>
+
+          <!-- Row 3: Role & Department -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="employeeDepartment">Department <span class="required">*</span></label>
+              <select id="employeeDepartment" class="form-control" required>
+                <option value="Engineering">Engineering</option>
+                <option value="Product & Design">Product & Design</option>
+                <option value="Human Resources">Human Resources</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales">Sales</option>
+                <option value="Finance & Accounting">Finance & Accounting</option>
+                <option value="Operations">Operations</option>
+                <option value="Customer Support">Customer Support</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="employeeDesignation">Job Title / Designation <span class="required">*</span></label>
+              <input type="text" id="employeeDesignation" class="form-control" placeholder="e.g. Senior Frontend Engineer" required>
+            </div>
+          </div>
+
+          <!-- Row 4: Compensation & Status -->
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label" for="employeeSalary">Monthly Salary (PKR) <span class="required">*</span></label>
+              <input type="number" id="employeeSalary" class="form-control" placeholder="e.g. 120000" min="1" step="1000" required>
+              <span class="form-hint">Must be greater than 0</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="employeeJoiningDate">Joining Date <span class="required">*</span></label>
+              <input type="date" id="employeeJoiningDate" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="employeeStatus">Account Status</label>
+              <select id="employeeStatus" class="form-control">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive / Suspended</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="UI.closeModal('employeeModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save" style="width: 16px; height: 16px;"></i> Save Employee
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/employees.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const company = Storage.getCompany();
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      Employees.init();
+      SmartHelper.init();
+    });
+  </script>
+</body>
+</html>

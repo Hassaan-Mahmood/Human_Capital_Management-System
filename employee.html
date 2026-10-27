@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Portal - HCM Lite</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="brand-icon-box">
+            <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
+          </div>
+          <span class="brand-title-text" id="sidebarCompanyName">HCM Lite</span>
+          <span class="brand-title-badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">PORTAL</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">My Workspace</div>
+        <a href="employee.html" class="nav-item active">
+          <i data-lucide="layout-dashboard"></i>
+          <span>My Dashboard</span>
+        </a>
+        <a href="payslip.html" class="nav-item">
+          <i data-lucide="receipt"></i>
+          <span>My Payslip</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 0.72rem; color: #64748b; padding: 0 4px;">
+          HCM Lite &bull; Employee Session
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Toggle Navigation">
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Employee Self-Service</h1>
+            <p>Punctuality punch-card, time-off requests & personal history</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+            <i data-lucide="moon" style="width: 18px; height: 18px;"></i>
+          </button>
+
+          <div class="user-profile-menu">
+            <div id="topbarUserAvatar" class="user-avatar">EM</div>
+            <div class="user-info">
+              <span id="topbarUserName" class="name">Employee</span>
+              <span id="topbarUserRole" class="role-badge">Staff Member</span>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn-logout" title="Sign Out">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Container -->
+      <div class="page-container">
+
+        <!-- Welcome Banner & Attendance Punch Card -->
+        <div class="punch-card">
+          <div class="punch-header">
+            <div>
+              <div id="liveDate" class="punch-date-display">Loading date...</div>
+              <div id="liveClock" class="punch-time-display">00:00:00</div>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 0.8rem; color: #c7d2fe; display: block; margin-bottom: 4px;">Today's Attendance</span>
+              <div id="todayAttendanceStatus">
+                <span class="badge badge-warning">Checking...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="punch-actions">
+            <button id="checkInBtn" class="punch-btn punch-btn-in">
+              <i data-lucide="log-in" style="width: 20px; height: 20px;"></i> Check In
+            </button>
+            <button id="checkOutBtn" class="punch-btn punch-btn-out" disabled>
+              <i data-lucide="log-out" style="width: 20px; height: 20px;"></i> Check Out
+            </button>
+            <button id="cameraCheckInBtn" class="punch-btn punch-btn-camera" title="Biometric Camera Verification (Bonus)">
+              <i data-lucide="camera" style="width: 20px; height: 20px;"></i> Webcam Punch (Bonus)
+            </button>
+          </div>
+
+          <div class="punch-status-bar">
+            <div>Check-in: <strong id="todayCheckInTime" style="color: #ffffff;">--:--</strong></div>
+            <div>Check-out: <strong id="todayCheckOutTime" style="color: #ffffff;">--:--</strong></div>
+            <div>Work Hours: <strong id="todayHoursWorked" style="color: #34d399;">0 hrs</strong></div>
+          </div>
+        </div>
+
+        <!-- Leave Summary Grid -->
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Annual Leave Quota</span>
+              <span id="empQuotaDisplay" class="stat-value">20 days</span>
+              <span class="stat-desc">Standard yearly allocation</span>
+            </div>
+            <div class="stat-icon-box stat-icon-primary"><i data-lucide="award"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Remaining Balance</span>
+              <span id="empRemainingLeaveDisplay" class="stat-value" style="color: var(--success);">20 days</span>
+              <span class="stat-desc">Available for application</span>
+            </div>
+            <div class="stat-icon-box stat-icon-success"><i data-lucide="check-circle-2"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Approved Leaves Used</span>
+              <span id="empUsedLeaveDisplay" class="stat-value">0 days</span>
+              <span class="stat-desc">In current calendar year</span>
+            </div>
+            <div class="stat-icon-box stat-icon-info"><i data-lucide="calendar"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-title">Pending Submissions</span>
+              <span id="empPendingLeavesDisplay" class="stat-value" style="color: var(--warning);">0</span>
+              <span class="stat-desc">Under HR evaluation</span>
+            </div>
+            <div class="stat-icon-box stat-icon-warning"><i data-lucide="clock"></i></div>
+          </div>
+        </div>
+
+        <!-- Leave Application & Announcements Row -->
+        <div class="dashboard-grid-2">
+          <!-- Apply for Leave Form Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i data-lucide="send" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                Apply for Time Off
+              </h3>
+            </div>
+
+            <form id="leaveApplyForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="leaveType">Leave Category <span class="required">*</span></label>
+                  <select id="leaveType" class="form-control" required>
+                    <option value="casual">Casual Leave (Paid)</option>
+                    <option value="sick">Sick Leave (Paid)</option>
+                    <option value="annual">Annual Leave (Paid)</option>
+                    <option value="unpaid">Unpaid Leave (No Quota Deduction)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Calculated Working Days</label>
+                  <div id="calculatedWorkingDays" style="padding: 10px 14px; background: var(--bg-surface-hover); border-radius: var(--radius-md); font-weight: 700; color: var(--primary-700); border: 1px solid var(--border-color);">
+                    0 working days
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="leaveStartDate">Start Date <span class="required">*</span></label>
+                  <input type="date" id="leaveStartDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="leaveEndDate">End Date <span class="required">*</span></label>
+                  <input type="date" id="leaveEndDate" class="form-control" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="leaveReason">Reason for Request <span class="required">*</span></label>
+                <textarea id="leaveReason" class="form-control" rows="3" placeholder="Provide details regarding your leave request..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i> Submit Leave Application
+              </button>
+            </form>
+          </div>
+
+          <!-- Announcements Feed Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i data-lucide="megaphone" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                Company Notices
+              </h3>
+            </div>
+            <div id="announcementsContainer" class="announcement-list" style="max-height: 380px; overflow-y: auto;">
+              <!-- Dynamic company announcements -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Leave Requests History Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i data-lucide="calendar-check" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+              My Leave Request History
+            </h3>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Dates Range</th>
+                  <th>Working Days</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>HR Decision / Comment</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody id="employeeLeaveHistoryBody">
+                <!-- Dynamically populated leaves -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Attendance History Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+              My Recent Attendance Logs
+            </h3>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Hours Worked</th>
+                  <th>Punctuality Status</th>
+                  <th>Method</th>
+                </tr>
+              </thead>
+              <tbody id="employeeAttendanceHistoryBody">
+                <!-- Dynamically populated attendance logs -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Webcam Biometric Modal (Bonus Feature) -->
+  <div id="webcamModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i data-lucide="camera" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+          Biometric Camera Verification
+        </h3>
+        <button id="closeWebcamModalBtn" class="modal-close-btn">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Center your face inside the camera preview to log biometric attendance.
+        </p>
+
+        <div style="position: relative; width: 320px; height: 240px; margin: 0 auto; border-radius: var(--radius-lg); overflow: hidden; background: #000000; border: 2px solid var(--primary-500);">
+          <video id="webcamVideo" width="320" height="240" autoplay playsinline muted style="object-fit: cover;"></video>
+          <div style="position: absolute; top: 10px; right: 10px; background: rgba(16, 185, 129, 0.8); color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600;">
+            LIVE SENSOR
+          </div>
+        </div>
+
+        <canvas id="webcamCanvas" style="display: none;"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="Attendance.closeWebcamModal()">Cancel</button>
+        <button type="button" id="captureWebcamBtn" class="btn btn-success">
+          <i data-lucide="aperture" style="width: 16px; height: 16px;"></i> Capture & Punch Attendance
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/leave.js"></script>
+  <script src="js/announcements.js"></script>
+  <script src="js/helper.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const company = Storage.getCompany();
+      const sidebarName = document.getElementById('sidebarCompanyName');
+      if (sidebarName && company.name) sidebarName.textContent = company.name;
+
+      // Initialize modules for employee
+      Attendance.initEmployeeAttendance();
+      Leaves.initEmployeeLeave();
+      Announcements.init();
+      SmartHelper.init();
+    });
+  </script>
+</body>
+</html>

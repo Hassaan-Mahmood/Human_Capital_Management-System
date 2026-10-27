@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HCM Lite - HR Management Portal</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons & SweetAlert2 CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="auth-page">
+
+  <div class="auth-split-wrapper">
+    <!-- Left Hero Side -->
+    <div class="auth-hero-side">
+      <div class="auth-hero-brand">
+        <div class="logo-icon">
+          <i data-lucide="layers" style="width: 24px; height: 24px;"></i>
+        </div>
+        <span>HCM Lite</span>
+      </div>
+
+      <div class="auth-hero-content">
+        <div class="auth-hero-badge">
+          <i data-lucide="award" style="width: 14px; height: 14px;"></i>
+          <span>Saylani Hackathon &bull; Beginner Track</span>
+        </div>
+        <h1 class="auth-hero-title">Human Capital Management</h1>
+        <p class="auth-hero-desc">
+          A lightweight, privacy-focused, browser-native HRMS engineered with pure HTML5, CSS3, ES6+ JavaScript, and localStorage.
+        </p>
+
+        <div class="auth-feature-list">
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon"><i data-lucide="check" style="width: 16px; height: 16px;"></i></div>
+            <span>Intelligent attendance with grace-period and lateness tracking</span>
+          </div>
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon"><i data-lucide="check" style="width: 16px; height: 16px;"></i></div>
+            <span>Annual paid leave quotas and overlap conflict prevention</span>
+          </div>
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon"><i data-lucide="check" style="width: 16px; height: 16px;"></i></div>
+            <span>Formula-accurate monthly payslip generation & print PDF export</span>
+          </div>
+          <div class="auth-feature-item">
+            <div class="auth-feature-icon"><i data-lucide="check" style="width: 16px; height: 16px;"></i></div>
+            <span>Rule-based Smart Helper chat assistant answering from live data</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-hero-footer">
+        &copy; 2026 HCM Lite. Designed for Hackathon Demonstration. Zero external backends required.
+      </div>
+    </div>
+
+    <!-- Right Form Side -->
+    <div class="auth-form-side">
+      <!-- 1. LOGIN CARD (Shown when system is initialized) -->
+      <div id="loginCard" class="auth-form-container" style="display: none;">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Welcome back</h2>
+          <p class="auth-form-subtitle">Please enter your company credentials to access your portal.</p>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email Address <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-icon-left"><i data-lucide="mail" style="width: 18px; height: 18px;"></i></span>
+              <input type="email" id="loginEmail" class="form-control has-left-icon" placeholder="name@company.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;">
+              <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password <span class="required">*</span></label>
+              <a href="#" id="forgotPasswordLink" class="auth-link" style="font-size: 0.8rem;">Forgot password?</a>
+            </div>
+            <div class="input-group">
+              <span class="input-icon-left"><i data-lucide="lock" style="width: 18px; height: 18px;"></i></span>
+              <input type="password" id="loginPassword" class="form-control has-left-icon has-right-icon" placeholder="Enter password" required>
+              <button type="button" class="input-icon-right toggle-password-btn" data-target="loginPassword">
+                <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" id="rememberMe" checked>
+              <span class="form-check-label">Remember my session</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 8px;">
+            <i data-lucide="log-in" style="width: 18px; height: 18px;"></i> Sign In to Portal
+          </button>
+        </form>
+
+        <div class="auth-form-footer">
+          <span>First time setting up?</span>
+          <button type="button" class="auth-link" onclick="Storage.resetAllData(); location.reload();">Reset to Setup Wizard</button>
+        </div>
+      </div>
+
+      <!-- 2. FIRST-RUN SETUP CARD (Shown when no company exists) -->
+      <div id="setupCard" class="auth-form-container auth-setup-container" style="display: none;">
+        <div class="auth-form-header">
+          <div class="badge badge-primary" style="margin-bottom: 10px; background: var(--primary-50); color: var(--primary-700); padding: 6px 12px;">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Initial System Setup
+          </div>
+          <h2 class="auth-form-title">Initialize Your Company</h2>
+          <p class="auth-form-subtitle">Create your organization and the root administrator account to get started.</p>
+        </div>
+
+        <form id="setupForm" novalidate>
+          <!-- Section 1: Company Profile -->
+          <div class="setup-section-card setup-section-card-top" >
+            <div class="setup-section-title">
+              <i data-lucide="briefcase" style="width: 18px; height: 18px; color: var(--primary-600);"></i>
+              Organization Profile
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="setupCompanyName">Company Name <span class="required">*</span></label>
+              <input type="text" id="setupCompanyName" class="form-control" placeholder="e.g. Acme Corporation" required>
+            </div>
+          </div>
+
+          <!-- Section 2: Administrator Account -->
+          <div class="setup-section-card">
+            <div class="setup-section-title">
+              <i data-lucide="shield-check" style="width: 18px; height: 18px; color: var(--primary-600);"></i>
+              Root Administrator Credentials
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="setupAdminName">Full Name <span class="required">*</span></label>
+                <input type="text" id="setupAdminName" class="form-control" placeholder="e.g. Sarah Jenkins" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setupAdminEmail">Work Email <span class="required">*</span></label>
+                <input type="email" id="setupAdminEmail" class="form-control" placeholder="admin@acme.com" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="setupPassword">Password <span class="required">*</span></label>
+                <div class="input-group">
+                  <input type="password" id="setupPassword" class="form-control has-right-icon" placeholder="Min 6 characters" required>
+                  <button type="button" class="input-icon-right toggle-password-btn" data-target="setupPassword">
+                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setupConfirmPassword">Confirm Password <span class="required">*</span></label>
+                <div class="input-group">
+                  <input type="password" id="setupConfirmPassword" class="form-control has-right-icon" placeholder="Re-enter password" required>
+                  <button type="button" class="input-icon-right toggle-password-btn" data-target="setupConfirmPassword">
+                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Attendance & Policy Configuration -->
+          <div class="setup-section-card">
+            <div class="setup-section-title">
+              <i data-lucide="clock" style="width: 18px; height: 18px; color: var(--primary-600);"></i>
+              Attendance & Leave Policies
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label" for="setupStartTime">Office Start Time</label>
+                <input type="time" id="setupStartTime" class="form-control" value="09:00" required>
+                <span class="form-hint">Official check-in</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setupGracePeriod">Grace Period (Mins)</label>
+                <input type="number" id="setupGracePeriod" class="form-control" value="15" min="0" max="120" required>
+                <span class="form-hint">Punctuality leeway</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setupLeaveQuota">Annual Paid Leave</label>
+                <input type="number" id="setupLeaveQuota" class="form-control" value="20" min="1" max="100" required>
+                <span class="form-hint">Days per employee</span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Scheduled Working Days</label>
+              <div class="days-picker-group">
+                <div>
+                  <input type="checkbox" id="day_1" name="setupWorkingDays" value="1" class="day-pill-checkbox" checked>
+                  <label for="day_1" class="day-pill-label">Mon</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_2" name="setupWorkingDays" value="2" class="day-pill-checkbox" checked>
+                  <label for="day_2" class="day-pill-label">Tue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_3" name="setupWorkingDays" value="3" class="day-pill-checkbox" checked>
+                  <label for="day_3" class="day-pill-label">Wed</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_4" name="setupWorkingDays" value="4" class="day-pill-checkbox" checked>
+                  <label for="day_4" class="day-pill-label">Thu</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_5" name="setupWorkingDays" value="5" class="day-pill-checkbox" checked>
+                  <label for="day_5" class="day-pill-label">Fri</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_6" name="setupWorkingDays" value="6" class="day-pill-checkbox">
+                  <label for="day_6" class="day-pill-label">Sat</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="day_0" name="setupWorkingDays" value="0" class="day-pill-checkbox">
+                  <label for="day_0" class="day-pill-label">Sun</label>
+                </div>
+              </div>
+              <span class="form-hint">Attendance and payslip absence deductions will apply only to selected days.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+            <i data-lucide="rocket" style="width: 18px; height: 18px;"></i> Complete Setup & Launch Portal
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Auth.initIndexPage();
+    });
+  </script>
+</body>
+</html>
